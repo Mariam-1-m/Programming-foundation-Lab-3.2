@@ -1,101 +1,63 @@
 
-	
-// #include "../include/magicBox.h"
-// #include "../include/menu.h" 
-// #include <iostream>
-// #include <vector>
-
-// void generateAndPrint(int n, int startX, int startY) {
-//     if (n % 2 == 0) {
-//         goToXY(startX, startY);
-//         std::cout << "Error: N must be an odd number!";
-//         return;
-//     }
-
-//     std::vector<int> magicBox(n * n, 0);
-
-//     int row = 0;
-//     int col = n / 2;
-//     magicBox[row * n + col] = 1;
-
-//     for (int num = 2; num <= n * n; num++) {
-//         int prevRow = row;
-//         int prevCol = col;
-
-//         row--;
-//         col++;
-
-//         if (row < 0) row = n - 1;
-//         if (col >= n) col = 0;
-
-//         if (magicBox[row * n + col] != 0) {
-//             row = prevRow + 1;
-//             col = prevCol;
-//         }
-
-//         magicBox[row * n + col] = num;
-//     }
-
-//     for (int r = 0; r < n; r++) {
-//         goToXY(startX, startY + r);
-        
-//         for (int c = 0; c < n; c++) {
-//             std::cout << magicBox[r * n + c] << "\t";
-//         }
-//     }
-// }
-
-#include "../include/magicBox.h"
 #include <iostream>
-#include <iomanip>
-#include <thread>
-#include <chrono>
+using namespace std;
+#include <ctime>
+#include "../include/magicBox.h"
 
-MagicBox::MagicBox(int size, int x, int y, int delay) 
-    : n(size), startX(x), startY(y), delayMs(delay) {
 
-    if (n % 2 == 0) {
-        n += 1;
+void goToXY(int x,int y){
+ 
+ std::cout<<"\033["<<x+1<<";"<<y+1<<"H"<<std::flush;
+ 
+}
+
+int takeInput(){
+     int boxSize=0;
+ cout<<"Enter the size of the box: \n";
+   cin>>boxSize;
+   if(boxSize%2==0){
+    cout<<"Order must be an odd number!\n";
+    return 0;
+   }
+   return boxSize;
+}
+
+void delay(int delayMs){
+    int start=clock();
+    int delayS=delayMs* (CLOCKS_PER_SEC/1000);
+    while((clock()-start)<delayS){
+
     }
 }
 
-void MagicBox::sleepFor(int milliseconds) const {
-    std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
-}
+void displayMagicBox( int boxSize){
+   int prevRow,prevCol;
+   int row=0;
+   int col=boxSize/2;
+  
 
-void MagicBox::display() const {
-    std::cout << "\033[2J\033[1;1H"; 
-    
-    std::cout << "\033[" << (startY - 2) << ";" << startX << "H"
-              << "=== MAGIC BOX (Order " << n << " x " << n << ") ===\n";
 
-    int totalCells = n * n;
+   
 
-    for (int k = 1; k <= totalCells; ++k) {
-        int term1 = (n + 2 * k - 3) / 2;
-        int term2 = (k - 1) / n;
-        int a = ((term1 + term2) % n + n) % n + 1; 
+goToXY((row+6),(col*4)+15);
+   cout<<1<<" ";
+   for(int i=2;i<=boxSize*boxSize;i++){
+    prevRow=row;
+    prevCol=col;
 
-        int term3 = n - k - 2;
-        int term4 = 2 * ((k - 1) / n);
-        int b = ((term3 + term4) % n + n) % n + 1; 
 
-        int row = a - 1;
-        int col = b - 1;
+  row=(row-1+boxSize)%boxSize;
+  col=(col+1)%boxSize;
 
-     
-        int cellWidth = 4;
-        int currentX = startX + (col * cellWidth);
-        int currentY = startY + row;
+  if((i-1) % boxSize==0){
+    row=(prevRow+1)%boxSize;
+    col=prevCol;
+  }
+ 
+delay(500);
+goToXY((row+6),(col*4)+15);
+   cout<<i<<" ";
 
-        std::cout << "\033[" << currentY << ";" << currentX << "H";
 
-        std::cout  << std::setw(2) << k << " ";
-
-        std::cout << std::flush;
-        sleepFor(delayMs);
-    }
-
-    std::cout << "\033[" << (startY + n + 2) << ";" << startX << "H";
-    std::cout << "Magic Box Generation Complete!\n\n";
+   }
 }
